@@ -112,7 +112,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
 
     function mintDev() public onlyOwner {
         require(totalNft == 0, "TTLISNZ");
-        _mintId(msg.sender, 1, 0);
+        _mintId(msg.sender, 1, 1);
     }
 
     function setSigner(address _signer) public onlyOwner {
@@ -138,6 +138,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     /************************** Private Functions **************************/
 
     function _mintId(address user, uint256 id, uint256 amount) private {
+        require(amount != 0,"AMIZ");
         _mint(user, id, amount, "");
         totalNft++;
         totalSupply[id]++;
