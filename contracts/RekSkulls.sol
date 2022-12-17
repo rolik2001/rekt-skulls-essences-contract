@@ -26,16 +26,19 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     mapping(uint256 => uint256) public totalSupply;
     mapping(address => uint256) public mintNonce;
 
+    event Mint(address indexed user, uint256 indexed id, uint256 amount);
+    event Burn(address indexed user, uint256 indexed id, uint256 amount);
+
 
     modifier SupportedId(uint256 id){
         require(id >= 1 && id <= 4, "INCID");
         _;
     }
 
-    modifier CorrectNonce(uint256 nonce, uint256 amount) {
-        require(mintNonce[msg.sender] <= nonce, "NISC");
+    modifier CorrectNonce(uint256 nonce) {
+        require((mintNonce[msg.sender]+1) == nonce, "NISC");
         _;
-        mintNonce[msg.sender] += amount;
+        mintNonce[msg.sender]++;
     }
 
 
@@ -53,7 +56,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
 
     function mintWLWithSignature(uint256 id, uint256 nonce, bytes memory sig) external
     SupportedId(id)
-    CorrectNonce(nonce, 1)
+    CorrectNonce(nonce)
     {
         require(wlActive, "WLNTSTR");
         require((totalNft + 1) <= WL_TOTAL_NFT, "SUPEXC");
@@ -78,6 +81,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         _burn(msg.sender, id, amount);
         totalNft -= amount;
         totalSupply[id] -= amount;
+        emit Burn(msg.sender,id,amount);
     }
 
 
@@ -138,9 +142,10 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     /************************** Private Functions **************************/
 
     function _mintId(address user, uint256 id, uint256 amount) private {
-        require(amount != 0,"AMIZ");
+        require(amount != 0, "AMIZ");
         _mint(user, id, amount, "");
-        totalNft++;
-        totalSupply[id]++;
+        totalNft += amount;
+        totalSupply[id] += amount;
+        emit Mint(user,id,amount);
     }
 }
