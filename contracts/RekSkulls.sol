@@ -33,7 +33,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     }
 
     modifier CorrectNonce(uint256 nonce, uint256 amount) {
-        require(mintNonce[msg.sender] == nonce, "NISC");
+        require(mintNonce[msg.sender] <= nonce, "NISC");
         _;
         mintNonce[msg.sender] += amount;
     }
