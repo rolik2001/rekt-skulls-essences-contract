@@ -134,6 +134,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
 
     function _mintId(address user, uint256 id, uint256 amount) private {
         require(amount != 0, "AMIZ");
+        require((totalNft + amount) <= MAX_NFT,"SUPEXC");
         _mint(user, id, amount, "");
         totalNft += amount;
         totalSupply[id] += amount;
