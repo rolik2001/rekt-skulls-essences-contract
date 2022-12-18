@@ -61,15 +61,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         require(wlActive, "WLNTSTR");
         require((totalNft + 1) <= WL_TOTAL_NFT, "SUPEXC");
 
-        bytes32 hash = ECDSA.toEthSignedMessageHash(
-            keccak256(
-                abi.encode(
-                    id,
-                    nonce,
-                    msg.sender
-                )
-            )
-        );
+        bytes32 hash = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(id,nonce, msg.sender)));
 
         require(hash.recover(sig) == signer, "INVALID SIGN");
         _mintId(msg.sender, id, 1);
