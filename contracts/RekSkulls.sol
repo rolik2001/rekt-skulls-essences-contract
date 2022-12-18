@@ -66,7 +66,6 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
                 abi.encode(
                     id,
                     nonce,
-                    sig,
                     msg.sender
                 )
             )
@@ -77,7 +76,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     }
 
     function burn(uint256 id, uint256 amount) external SupportedId(id) {
-        require(amount > 0, "Amount bigger than zero");
+        require(amount != 0, "AMIZ");
         _burn(msg.sender, id, amount);
         totalNft -= amount;
         totalSupply[id] -= amount;

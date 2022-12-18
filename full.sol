@@ -2,7 +2,7 @@
 
 // File @openzeppelin/contracts/utils/math/Math.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.8.0) (utils/math/Math.sol)
 
 pragma solidity ^0.8.0;
@@ -351,7 +351,7 @@ library Math {
 
 // File @openzeppelin/contracts/utils/Strings.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.8.0) (utils/Strings.sol)
 
 pragma solidity ^0.8.0;
@@ -421,224 +421,9 @@ library Strings {
 }
 
 
-// File @openzeppelin/contracts/utils/cryptography/ECDSA.sol@v4.8.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.8.0) (utils/cryptography/ECDSA.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Elliptic Curve Digital Signature Algorithm (ECDSA) operations.
- *
- * These functions can be used to verify that a message was signed by the holder
- * of the private keys of a given address.
- */
-library ECDSA {
-    enum RecoverError {
-        NoError,
-        InvalidSignature,
-        InvalidSignatureLength,
-        InvalidSignatureS,
-        InvalidSignatureV // Deprecated in v4.8
-    }
-
-    function _throwError(RecoverError error) private pure {
-        if (error == RecoverError.NoError) {
-            return; // no error: do nothing
-        } else if (error == RecoverError.InvalidSignature) {
-            revert("ECDSA: invalid signature");
-        } else if (error == RecoverError.InvalidSignatureLength) {
-            revert("ECDSA: invalid signature length");
-        } else if (error == RecoverError.InvalidSignatureS) {
-            revert("ECDSA: invalid signature 's' value");
-        }
-    }
-
-    /**
-     * @dev Returns the address that signed a hashed message (`hash`) with
-     * `signature` or error string. This address can then be used for verification purposes.
-     *
-     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:
-     * this function rejects them by requiring the `s` value to be in the lower
-     * half order, and the `v` value to be either 27 or 28.
-     *
-     * IMPORTANT: `hash` _must_ be the result of a hash operation for the
-     * verification to be secure: it is possible to craft signatures that
-     * recover to arbitrary addresses for non-hashed data. A safe way to ensure
-     * this is by receiving a hash of the original message (which may otherwise
-     * be too long), and then calling {toEthSignedMessageHash} on it.
-     *
-     * Documentation for signature generation:
-     * - with https://web3js.readthedocs.io/en/v1.3.4/web3-eth-accounts.html#sign[Web3.js]
-     * - with https://docs.ethers.io/v5/api/signer/#Signer-signMessage[ethers]
-     *
-     * _Available since v4.3._
-     */
-    function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError) {
-        if (signature.length == 65) {
-            bytes32 r;
-            bytes32 s;
-            uint8 v;
-            // ecrecover takes the signature parameters, and the only way to get them
-            // currently is to use assembly.
-            /// @solidity memory-safe-assembly
-            assembly {
-                r := mload(add(signature, 0x20))
-                s := mload(add(signature, 0x40))
-                v := byte(0, mload(add(signature, 0x60)))
-            }
-            return tryRecover(hash, v, r, s);
-        } else {
-            return (address(0), RecoverError.InvalidSignatureLength);
-        }
-    }
-
-    /**
-     * @dev Returns the address that signed a hashed message (`hash`) with
-     * `signature`. This address can then be used for verification purposes.
-     *
-     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:
-     * this function rejects them by requiring the `s` value to be in the lower
-     * half order, and the `v` value to be either 27 or 28.
-     *
-     * IMPORTANT: `hash` _must_ be the result of a hash operation for the
-     * verification to be secure: it is possible to craft signatures that
-     * recover to arbitrary addresses for non-hashed data. A safe way to ensure
-     * this is by receiving a hash of the original message (which may otherwise
-     * be too long), and then calling {toEthSignedMessageHash} on it.
-     */
-    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, signature);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
-     * @dev Overload of {ECDSA-tryRecover} that receives the `r` and `vs` short-signature fields separately.
-     *
-     * See https://eips.ethereum.org/EIPS/eip-2098[EIP-2098 short signatures]
-     *
-     * _Available since v4.3._
-     */
-    function tryRecover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address, RecoverError) {
-        bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
-        uint8 v = uint8((uint256(vs) >> 255) + 27);
-        return tryRecover(hash, v, r, s);
-    }
-
-    /**
-     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.
-     *
-     * _Available since v4.2._
-     */
-    function recover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, r, vs);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
-     * @dev Overload of {ECDSA-tryRecover} that receives the `v`,
-     * `r` and `s` signature fields separately.
-     *
-     * _Available since v4.3._
-     */
-    function tryRecover(
-        bytes32 hash,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (address, RecoverError) {
-        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
-        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
-        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
-        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
-        //
-        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
-        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
-        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
-        // these malleable signatures as well.
-        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
-            return (address(0), RecoverError.InvalidSignatureS);
-        }
-
-        // If the signature is valid (and not malleable), return the signer address
-        address signer = ecrecover(hash, v, r, s);
-        if (signer == address(0)) {
-            return (address(0), RecoverError.InvalidSignature);
-        }
-
-        return (signer, RecoverError.NoError);
-    }
-
-    /**
-     * @dev Overload of {ECDSA-recover} that receives the `v`,
-     * `r` and `s` signature fields separately.
-     */
-    function recover(
-        bytes32 hash,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);
-        _throwError(error);
-        return recovered;
-    }
-
-    /**
-     * @dev Returns an Ethereum Signed Message, created from a `hash`. This
-     * produces hash corresponding to the one signed with the
-     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
-     * JSON-RPC method as part of EIP-191.
-     *
-     * See {recover}.
-     */
-    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
-        // 32 is the length in bytes of hash,
-        // enforced by the type signature above
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
-    }
-
-    /**
-     * @dev Returns an Ethereum Signed Message, created from `s`. This
-     * produces hash corresponding to the one signed with the
-     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
-     * JSON-RPC method as part of EIP-191.
-     *
-     * See {recover}.
-     */
-    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
-    }
-
-    /**
-     * @dev Returns an Ethereum Signed Typed Data, created from a
-     * `domainSeparator` and a `structHash`. This produces hash corresponding
-     * to the one signed with the
-     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]
-     * JSON-RPC method as part of EIP-712.
-     *
-     * See {recover}.
-     */
-    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-    }
-}
-
-
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.8.0) (utils/Address.sol)
 
 pragma solidity ^0.8.1;
@@ -861,7 +646,7 @@ library AddressUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.8.0) (proxy/utils/Initializable.sol)
 
 pragma solidity ^0.8.2;
@@ -1028,7 +813,7 @@ abstract contract Initializable {
 
 // File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
 
 pragma solidity ^0.8.0;
@@ -1066,106 +851,9 @@ abstract contract ContextUpgradeable is Initializable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol@v4.8.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)
-
-pragma solidity ^0.8.0;
-
-
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
- *
- * By default, the owner account will be the one that deploys the contract. This
- * can later be changed with {transferOwnership}.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
- */
-abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    function __Ownable_init() internal onlyInitializing {
-        __Ownable_init_unchained();
-    }
-
-    function __Ownable_init_unchained() internal onlyInitializing {
-        _transferOwnership(_msgSender());
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        _checkOwner();
-        _;
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if the sender is not the owner.
-     */
-    function _checkOwner() internal view virtual {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public virtual onlyOwner {
-        _transferOwnership(address(0));
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Internal function without access restriction.
-     */
-    function _transferOwnership(address newOwner) internal virtual {
-        address oldOwner = _owner;
-        _owner = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
-    }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
-}
-
-
 // File @openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
 
 pragma solidity ^0.8.0;
@@ -1192,36 +880,9 @@ interface IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol@v4.8.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.6.0) (interfaces/IERC2981.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Interface for the NFT Royalty Standard.
- *
- * A standardized way to retrieve royalty payment information for non-fungible tokens (NFTs) to enable universal
- * support for royalty payments across all NFT marketplaces and ecosystem participants.
- *
- * _Available since v4.5._
- */
-interface IERC2981Upgradeable is IERC165Upgradeable {
-    /**
-     * @dev Returns how much royalty is owed and to whom, based on a sale price that may be denominated in any unit of
-     * exchange. The royalty amount is denominated and should be paid in that same unit of exchange.
-     */
-    function royaltyInfo(uint256 tokenId, uint256 salePrice)
-        external
-        view
-        returns (address receiver, uint256 royaltyAmount);
-}
-
-
 // File @openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
 
 pragma solidity ^0.8.0;
@@ -1263,195 +924,9 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol@v4.8.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.7.0) (token/common/ERC2981.sol)
-
-pragma solidity ^0.8.0;
-
-
-
-/**
- * @dev Implementation of the NFT Royalty Standard, a standardized way to retrieve royalty payment information.
- *
- * Royalty information can be specified globally for all token ids via {_setDefaultRoyalty}, and/or individually for
- * specific token ids via {_setTokenRoyalty}. The latter takes precedence over the first.
- *
- * Royalty is specified as a fraction of sale price. {_feeDenominator} is overridable but defaults to 10000, meaning the
- * fee is specified in basis points by default.
- *
- * IMPORTANT: ERC-2981 only specifies a way to signal royalty information and does not enforce its payment. See
- * https://eips.ethereum.org/EIPS/eip-2981#optional-royalty-payments[Rationale] in the EIP. Marketplaces are expected to
- * voluntarily pay royalties together with sales, but note that this standard is not yet widely supported.
- *
- * _Available since v4.5._
- */
-abstract contract ERC2981Upgradeable is Initializable, IERC2981Upgradeable, ERC165Upgradeable {
-    function __ERC2981_init() internal onlyInitializing {
-    }
-
-    function __ERC2981_init_unchained() internal onlyInitializing {
-    }
-    struct RoyaltyInfo {
-        address receiver;
-        uint96 royaltyFraction;
-    }
-
-    RoyaltyInfo private _defaultRoyaltyInfo;
-    mapping(uint256 => RoyaltyInfo) private _tokenRoyaltyInfo;
-
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165Upgradeable, ERC165Upgradeable) returns (bool) {
-        return interfaceId == type(IERC2981Upgradeable).interfaceId || super.supportsInterface(interfaceId);
-    }
-
-    /**
-     * @inheritdoc IERC2981Upgradeable
-     */
-    function royaltyInfo(uint256 _tokenId, uint256 _salePrice) public view virtual override returns (address, uint256) {
-        RoyaltyInfo memory royalty = _tokenRoyaltyInfo[_tokenId];
-
-        if (royalty.receiver == address(0)) {
-            royalty = _defaultRoyaltyInfo;
-        }
-
-        uint256 royaltyAmount = (_salePrice * royalty.royaltyFraction) / _feeDenominator();
-
-        return (royalty.receiver, royaltyAmount);
-    }
-
-    /**
-     * @dev The denominator with which to interpret the fee set in {_setTokenRoyalty} and {_setDefaultRoyalty} as a
-     * fraction of the sale price. Defaults to 10000 so fees are expressed in basis points, but may be customized by an
-     * override.
-     */
-    function _feeDenominator() internal pure virtual returns (uint96) {
-        return 10000;
-    }
-
-    /**
-     * @dev Sets the royalty information that all ids in this contract will default to.
-     *
-     * Requirements:
-     *
-     * - `receiver` cannot be the zero address.
-     * - `feeNumerator` cannot be greater than the fee denominator.
-     */
-    function _setDefaultRoyalty(address receiver, uint96 feeNumerator) internal virtual {
-        require(feeNumerator <= _feeDenominator(), "ERC2981: royalty fee will exceed salePrice");
-        require(receiver != address(0), "ERC2981: invalid receiver");
-
-        _defaultRoyaltyInfo = RoyaltyInfo(receiver, feeNumerator);
-    }
-
-    /**
-     * @dev Removes default royalty information.
-     */
-    function _deleteDefaultRoyalty() internal virtual {
-        delete _defaultRoyaltyInfo;
-    }
-
-    /**
-     * @dev Sets the royalty information for a specific token id, overriding the global default.
-     *
-     * Requirements:
-     *
-     * - `receiver` cannot be the zero address.
-     * - `feeNumerator` cannot be greater than the fee denominator.
-     */
-    function _setTokenRoyalty(
-        uint256 tokenId,
-        address receiver,
-        uint96 feeNumerator
-    ) internal virtual {
-        require(feeNumerator <= _feeDenominator(), "ERC2981: royalty fee will exceed salePrice");
-        require(receiver != address(0), "ERC2981: Invalid parameters");
-
-        _tokenRoyaltyInfo[tokenId] = RoyaltyInfo(receiver, feeNumerator);
-    }
-
-    /**
-     * @dev Resets royalty information for the token id back to the global default.
-     */
-    function _resetTokenRoyalty(uint256 tokenId) internal virtual {
-        delete _tokenRoyaltyInfo[tokenId];
-    }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[48] private __gap;
-}
-
-
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol@v4.8.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC1155/IERC1155Receiver.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev _Available since v3.1._
- */
-interface IERC1155ReceiverUpgradeable is IERC165Upgradeable {
-    /**
-     * @dev Handles the receipt of a single ERC1155 token type. This function is
-     * called at the end of a `safeTransferFrom` after the balance has been updated.
-     *
-     * NOTE: To accept the transfer, this must return
-     * `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`
-     * (i.e. 0xf23a6e61, or its own function selector).
-     *
-     * @param operator The address which initiated the transfer (i.e. msg.sender)
-     * @param from The address which previously owned the token
-     * @param id The ID of the token being transferred
-     * @param value The amount of tokens being transferred
-     * @param data Additional data with no specified format
-     * @return `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))` if transfer is allowed
-     */
-    function onERC1155Received(
-        address operator,
-        address from,
-        uint256 id,
-        uint256 value,
-        bytes calldata data
-    ) external returns (bytes4);
-
-    /**
-     * @dev Handles the receipt of a multiple ERC1155 token types. This function
-     * is called at the end of a `safeBatchTransferFrom` after the balances have
-     * been updated.
-     *
-     * NOTE: To accept the transfer(s), this must return
-     * `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`
-     * (i.e. 0xbc197c81, or its own function selector).
-     *
-     * @param operator The address which initiated the batch transfer (i.e. msg.sender)
-     * @param from The address which previously owned the token
-     * @param ids An array containing ids of each token being transferred (order and length must match values array)
-     * @param values An array containing amounts of each token being transferred (order and length must match ids array)
-     * @param data Additional data with no specified format
-     * @return `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))` if transfer is allowed
-     */
-    function onERC1155BatchReceived(
-        address operator,
-        address from,
-        uint256[] calldata ids,
-        uint256[] calldata values,
-        bytes calldata data
-    ) external returns (bytes4);
-}
-
-
 // File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC1155/IERC1155.sol)
 
 pragma solidity ^0.8.0;
@@ -1578,7 +1053,7 @@ interface IERC1155Upgradeable is IERC165Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/IERC1155MetadataURIUpgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts v4.4.1 (token/ERC1155/extensions/IERC1155MetadataURI.sol)
 
 pragma solidity ^0.8.0;
@@ -1600,9 +1075,69 @@ interface IERC1155MetadataURIUpgradeable is IERC1155Upgradeable {
 }
 
 
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol@v4.8.0
+
+// MIT
+// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC1155/IERC1155Receiver.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev _Available since v3.1._
+ */
+interface IERC1155ReceiverUpgradeable is IERC165Upgradeable {
+    /**
+     * @dev Handles the receipt of a single ERC1155 token type. This function is
+     * called at the end of a `safeTransferFrom` after the balance has been updated.
+     *
+     * NOTE: To accept the transfer, this must return
+     * `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`
+     * (i.e. 0xf23a6e61, or its own function selector).
+     *
+     * @param operator The address which initiated the transfer (i.e. msg.sender)
+     * @param from The address which previously owned the token
+     * @param id The ID of the token being transferred
+     * @param value The amount of tokens being transferred
+     * @param data Additional data with no specified format
+     * @return `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))` if transfer is allowed
+     */
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) external returns (bytes4);
+
+    /**
+     * @dev Handles the receipt of a multiple ERC1155 token types. This function
+     * is called at the end of a `safeBatchTransferFrom` after the balances have
+     * been updated.
+     *
+     * NOTE: To accept the transfer(s), this must return
+     * `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`
+     * (i.e. 0xbc197c81, or its own function selector).
+     *
+     * @param operator The address which initiated the batch transfer (i.e. msg.sender)
+     * @param from The address which previously owned the token
+     * @param ids An array containing ids of each token being transferred (order and length must match values array)
+     * @param values An array containing amounts of each token being transferred (order and length must match ids array)
+     * @param data Additional data with no specified format
+     * @return `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))` if transfer is allowed
+     */
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external returns (bytes4);
+}
+
+
 // File @openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol@v4.8.0
 
-// SPDX-License-Identifier: MIT
+// MIT
 // OpenZeppelin Contracts (last updated v4.8.0) (token/ERC1155/ERC1155.sol)
 
 pragma solidity ^0.8.0;
@@ -2131,9 +1666,474 @@ contract ERC1155Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
 }
 
 
+// File @openzeppelin/contracts/utils/cryptography/ECDSA.sol@v4.8.0
+
+// MIT
+// OpenZeppelin Contracts (last updated v4.8.0) (utils/cryptography/ECDSA.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Elliptic Curve Digital Signature Algorithm (ECDSA) operations.
+ *
+ * These functions can be used to verify that a message was signed by the holder
+ * of the private keys of a given address.
+ */
+library ECDSA {
+    enum RecoverError {
+        NoError,
+        InvalidSignature,
+        InvalidSignatureLength,
+        InvalidSignatureS,
+        InvalidSignatureV // Deprecated in v4.8
+    }
+
+    function _throwError(RecoverError error) private pure {
+        if (error == RecoverError.NoError) {
+            return; // no error: do nothing
+        } else if (error == RecoverError.InvalidSignature) {
+            revert("ECDSA: invalid signature");
+        } else if (error == RecoverError.InvalidSignatureLength) {
+            revert("ECDSA: invalid signature length");
+        } else if (error == RecoverError.InvalidSignatureS) {
+            revert("ECDSA: invalid signature 's' value");
+        }
+    }
+
+    /**
+     * @dev Returns the address that signed a hashed message (`hash`) with
+     * `signature` or error string. This address can then be used for verification purposes.
+     *
+     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:
+     * this function rejects them by requiring the `s` value to be in the lower
+     * half order, and the `v` value to be either 27 or 28.
+     *
+     * IMPORTANT: `hash` _must_ be the result of a hash operation for the
+     * verification to be secure: it is possible to craft signatures that
+     * recover to arbitrary addresses for non-hashed data. A safe way to ensure
+     * this is by receiving a hash of the original message (which may otherwise
+     * be too long), and then calling {toEthSignedMessageHash} on it.
+     *
+     * Documentation for signature generation:
+     * - with https://web3js.readthedocs.io/en/v1.3.4/web3-eth-accounts.html#sign[Web3.js]
+     * - with https://docs.ethers.io/v5/api/signer/#Signer-signMessage[ethers]
+     *
+     * _Available since v4.3._
+     */
+    function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError) {
+        if (signature.length == 65) {
+            bytes32 r;
+            bytes32 s;
+            uint8 v;
+            // ecrecover takes the signature parameters, and the only way to get them
+            // currently is to use assembly.
+            /// @solidity memory-safe-assembly
+            assembly {
+                r := mload(add(signature, 0x20))
+                s := mload(add(signature, 0x40))
+                v := byte(0, mload(add(signature, 0x60)))
+            }
+            return tryRecover(hash, v, r, s);
+        } else {
+            return (address(0), RecoverError.InvalidSignatureLength);
+        }
+    }
+
+    /**
+     * @dev Returns the address that signed a hashed message (`hash`) with
+     * `signature`. This address can then be used for verification purposes.
+     *
+     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:
+     * this function rejects them by requiring the `s` value to be in the lower
+     * half order, and the `v` value to be either 27 or 28.
+     *
+     * IMPORTANT: `hash` _must_ be the result of a hash operation for the
+     * verification to be secure: it is possible to craft signatures that
+     * recover to arbitrary addresses for non-hashed data. A safe way to ensure
+     * this is by receiving a hash of the original message (which may otherwise
+     * be too long), and then calling {toEthSignedMessageHash} on it.
+     */
+    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
+        (address recovered, RecoverError error) = tryRecover(hash, signature);
+        _throwError(error);
+        return recovered;
+    }
+
+    /**
+     * @dev Overload of {ECDSA-tryRecover} that receives the `r` and `vs` short-signature fields separately.
+     *
+     * See https://eips.ethereum.org/EIPS/eip-2098[EIP-2098 short signatures]
+     *
+     * _Available since v4.3._
+     */
+    function tryRecover(
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal pure returns (address, RecoverError) {
+        bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+        uint8 v = uint8((uint256(vs) >> 255) + 27);
+        return tryRecover(hash, v, r, s);
+    }
+
+    /**
+     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.
+     *
+     * _Available since v4.2._
+     */
+    function recover(
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal pure returns (address) {
+        (address recovered, RecoverError error) = tryRecover(hash, r, vs);
+        _throwError(error);
+        return recovered;
+    }
+
+    /**
+     * @dev Overload of {ECDSA-tryRecover} that receives the `v`,
+     * `r` and `s` signature fields separately.
+     *
+     * _Available since v4.3._
+     */
+    function tryRecover(
+        bytes32 hash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal pure returns (address, RecoverError) {
+        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
+        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
+        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
+        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
+        //
+        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
+        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
+        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
+        // these malleable signatures as well.
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            return (address(0), RecoverError.InvalidSignatureS);
+        }
+
+        // If the signature is valid (and not malleable), return the signer address
+        address signer = ecrecover(hash, v, r, s);
+        if (signer == address(0)) {
+            return (address(0), RecoverError.InvalidSignature);
+        }
+
+        return (signer, RecoverError.NoError);
+    }
+
+    /**
+     * @dev Overload of {ECDSA-recover} that receives the `v`,
+     * `r` and `s` signature fields separately.
+     */
+    function recover(
+        bytes32 hash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal pure returns (address) {
+        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);
+        _throwError(error);
+        return recovered;
+    }
+
+    /**
+     * @dev Returns an Ethereum Signed Message, created from a `hash`. This
+     * produces hash corresponding to the one signed with the
+     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
+     * JSON-RPC method as part of EIP-191.
+     *
+     * See {recover}.
+     */
+    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+        // 32 is the length in bytes of hash,
+        // enforced by the type signature above
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+    }
+
+    /**
+     * @dev Returns an Ethereum Signed Message, created from `s`. This
+     * produces hash corresponding to the one signed with the
+     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]
+     * JSON-RPC method as part of EIP-191.
+     *
+     * See {recover}.
+     */
+    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
+    }
+
+    /**
+     * @dev Returns an Ethereum Signed Typed Data, created from a
+     * `domainSeparator` and a `structHash`. This produces hash corresponding
+     * to the one signed with the
+     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]
+     * JSON-RPC method as part of EIP-712.
+     *
+     * See {recover}.
+     */
+    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
+    }
+}
+
+
+// File @openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol@v4.8.0
+
+// MIT
+// OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)
+
+pragma solidity ^0.8.0;
+
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    function __Ownable_init() internal onlyInitializing {
+        __Ownable_init_unchained();
+    }
+
+    function __Ownable_init_unchained() internal onlyInitializing {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        _checkOwner();
+        _;
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if the sender is not the owner.
+     */
+    function _checkOwner() internal view virtual {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[49] private __gap;
+}
+
+
+// File @openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol@v4.8.0
+
+// MIT
+// OpenZeppelin Contracts (last updated v4.6.0) (interfaces/IERC2981.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface for the NFT Royalty Standard.
+ *
+ * A standardized way to retrieve royalty payment information for non-fungible tokens (NFTs) to enable universal
+ * support for royalty payments across all NFT marketplaces and ecosystem participants.
+ *
+ * _Available since v4.5._
+ */
+interface IERC2981Upgradeable is IERC165Upgradeable {
+    /**
+     * @dev Returns how much royalty is owed and to whom, based on a sale price that may be denominated in any unit of
+     * exchange. The royalty amount is denominated and should be paid in that same unit of exchange.
+     */
+    function royaltyInfo(uint256 tokenId, uint256 salePrice)
+        external
+        view
+        returns (address receiver, uint256 royaltyAmount);
+}
+
+
+// File @openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol@v4.8.0
+
+// MIT
+// OpenZeppelin Contracts (last updated v4.7.0) (token/common/ERC2981.sol)
+
+pragma solidity ^0.8.0;
+
+
+
+/**
+ * @dev Implementation of the NFT Royalty Standard, a standardized way to retrieve royalty payment information.
+ *
+ * Royalty information can be specified globally for all token ids via {_setDefaultRoyalty}, and/or individually for
+ * specific token ids via {_setTokenRoyalty}. The latter takes precedence over the first.
+ *
+ * Royalty is specified as a fraction of sale price. {_feeDenominator} is overridable but defaults to 10000, meaning the
+ * fee is specified in basis points by default.
+ *
+ * IMPORTANT: ERC-2981 only specifies a way to signal royalty information and does not enforce its payment. See
+ * https://eips.ethereum.org/EIPS/eip-2981#optional-royalty-payments[Rationale] in the EIP. Marketplaces are expected to
+ * voluntarily pay royalties together with sales, but note that this standard is not yet widely supported.
+ *
+ * _Available since v4.5._
+ */
+abstract contract ERC2981Upgradeable is Initializable, IERC2981Upgradeable, ERC165Upgradeable {
+    function __ERC2981_init() internal onlyInitializing {
+    }
+
+    function __ERC2981_init_unchained() internal onlyInitializing {
+    }
+    struct RoyaltyInfo {
+        address receiver;
+        uint96 royaltyFraction;
+    }
+
+    RoyaltyInfo private _defaultRoyaltyInfo;
+    mapping(uint256 => RoyaltyInfo) private _tokenRoyaltyInfo;
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165Upgradeable, ERC165Upgradeable) returns (bool) {
+        return interfaceId == type(IERC2981Upgradeable).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @inheritdoc IERC2981Upgradeable
+     */
+    function royaltyInfo(uint256 _tokenId, uint256 _salePrice) public view virtual override returns (address, uint256) {
+        RoyaltyInfo memory royalty = _tokenRoyaltyInfo[_tokenId];
+
+        if (royalty.receiver == address(0)) {
+            royalty = _defaultRoyaltyInfo;
+        }
+
+        uint256 royaltyAmount = (_salePrice * royalty.royaltyFraction) / _feeDenominator();
+
+        return (royalty.receiver, royaltyAmount);
+    }
+
+    /**
+     * @dev The denominator with which to interpret the fee set in {_setTokenRoyalty} and {_setDefaultRoyalty} as a
+     * fraction of the sale price. Defaults to 10000 so fees are expressed in basis points, but may be customized by an
+     * override.
+     */
+    function _feeDenominator() internal pure virtual returns (uint96) {
+        return 10000;
+    }
+
+    /**
+     * @dev Sets the royalty information that all ids in this contract will default to.
+     *
+     * Requirements:
+     *
+     * - `receiver` cannot be the zero address.
+     * - `feeNumerator` cannot be greater than the fee denominator.
+     */
+    function _setDefaultRoyalty(address receiver, uint96 feeNumerator) internal virtual {
+        require(feeNumerator <= _feeDenominator(), "ERC2981: royalty fee will exceed salePrice");
+        require(receiver != address(0), "ERC2981: invalid receiver");
+
+        _defaultRoyaltyInfo = RoyaltyInfo(receiver, feeNumerator);
+    }
+
+    /**
+     * @dev Removes default royalty information.
+     */
+    function _deleteDefaultRoyalty() internal virtual {
+        delete _defaultRoyaltyInfo;
+    }
+
+    /**
+     * @dev Sets the royalty information for a specific token id, overriding the global default.
+     *
+     * Requirements:
+     *
+     * - `receiver` cannot be the zero address.
+     * - `feeNumerator` cannot be greater than the fee denominator.
+     */
+    function _setTokenRoyalty(
+        uint256 tokenId,
+        address receiver,
+        uint96 feeNumerator
+    ) internal virtual {
+        require(feeNumerator <= _feeDenominator(), "ERC2981: royalty fee will exceed salePrice");
+        require(receiver != address(0), "ERC2981: Invalid parameters");
+
+        _tokenRoyaltyInfo[tokenId] = RoyaltyInfo(receiver, feeNumerator);
+    }
+
+    /**
+     * @dev Resets royalty information for the token id back to the global default.
+     */
+    function _resetTokenRoyalty(uint256 tokenId) internal virtual {
+        delete _tokenRoyaltyInfo[tokenId];
+    }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[48] private __gap;
+}
+
+
 // File contracts/RekSkulls.sol
 
-// SPDX-License-Identifier: UNLICENSED
+// UNLICENSED
 pragma solidity 0.8.12;
 
 // Uncomment this line to use console.log
@@ -2199,7 +2199,6 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
                 abi.encode(
                     id,
                     nonce,
-                    sig,
                     msg.sender
                 )
             )
@@ -2210,7 +2209,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     }
 
     function burn(uint256 id, uint256 amount) external SupportedId(id) {
-        require(amount > 0, "Amount bigger than zero");
+        require(amount != 0, "AMIZ");
         _burn(msg.sender, id, amount);
         totalNft -= amount;
         totalSupply[id] -= amount;
