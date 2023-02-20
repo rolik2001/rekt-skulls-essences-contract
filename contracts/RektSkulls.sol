@@ -28,6 +28,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     mapping(address => uint256) public mintNonce;
 
     event Mint(address indexed user, uint256 indexed id, uint256 amount);
+    event MintBatch(address indexed user, uint256[] ids, uint256[] amounts);
     event Burn(address indexed user, uint256 indexed id, uint256 amount);
 
 
@@ -72,18 +73,18 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         _mintId(msg.sender, id, 1);
     }
 
-    function mintMystery(uint256 amount, address receiver) external onlyMysteryCardsManager {
-        _mintId(receiver, 5, amount);
-    }
 
-    function mintEssences(uint256[] memory ids, uint256[] memory amounts, address receiver) external
+    function mintEssences(address receiver, uint256[] memory ids, uint256[] memory amounts) external
     onlyMysteryCardsManager
     {
-        for(uint i = 0; i < ids.length;i++){
-            uint256 id = ids[i];
-            require(id >= 1 && id <= 4, "INCID");
-            _mintId(receiver,id,amounts[i]);
+        for (uint i = 0; i < ids.length; i++) {
+            require(ids[i] >= 1 && ids[i] <= 4, "INCID");
         }
+        _mintIds(receiver, ids, amounts);
+    }
+
+    function mintMystery(address receiver, uint256 amount) external onlyMysteryCardsManager {
+        _mintId(receiver, 5, amount);
     }
 
     function burn(uint256 id, uint256 amount) external SupportedId(id) {
@@ -92,6 +93,14 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         totalNft -= amount;
         totalSupply[id] -= amount;
         emit Burn(msg.sender, id, amount);
+    }
+
+    function burnMystery(address user, uint256 amount) external onlyMysteryCardsManager {
+        require(amount != 0, "AMIZ");
+        _burn(user, 5, amount);
+        totalNft -= amount;
+        totalSupply[5] -= amount;
+        emit Burn(msg.sender, 5, amount);
     }
 
 
@@ -162,5 +171,28 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         totalNft += amount;
         totalSupply[id] += amount;
         emit Mint(user, id, amount);
+    }
+
+    function _mintIds(
+        address user,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) private {
+        require(ids.length > 0, "LNGHSBBTZ");
+        require(ids.length == amounts.length, "LNGHATS");
+
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < ids.length; i++) {
+            totalSupply[ids[i]] += amounts[i];
+            totalAmount += amounts[i];
+        }
+
+        require(totalAmount != 0, "AMIZ");
+        require((totalNft + totalAmount) <= MAX_NFT, "SUPEXC");
+
+        _mintBatch(user, ids, amounts, "");
+
+        totalNft += totalAmount;
+        emit MintBatch(user, ids, amounts);
     }
 }
