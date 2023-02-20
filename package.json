@@ -8,6 +8,7 @@
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.0",
     "@openzeppelin/hardhat-upgrades": "^1.22.0",
+    "generate-contract-interface": "^0.1.13",
     "hardhat-contract-sizer": "^2.6.1"
   }
 }

@@ -14,6 +14,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     using ECDSA for bytes32;
 
     address public signer;
+    address public mysteryCardsManager;
     uint256 public totalNft;
     bool public wlActive;
 
@@ -36,11 +37,15 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     }
 
     modifier CorrectNonce(uint256 nonce) {
-        require((mintNonce[msg.sender]+1) == nonce, "NISC");
+        require((mintNonce[msg.sender] + 1) == nonce, "NISC");
         _;
         mintNonce[msg.sender]++;
     }
 
+    modifier onlyMysteryCardsManager(){
+        require(msg.sender == mysteryCardsManager, "NMCM");
+        _;
+    }
 
     function initialize() public initializer {
         __ERC1155_init("");
@@ -61,10 +66,24 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         require(wlActive, "WLNTSTR");
         require((totalNft + 1) <= WL_TOTAL_NFT, "SUPEXC");
 
-        bytes32 hash = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(id,nonce, msg.sender)));
+        bytes32 hash = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(id, nonce, msg.sender)));
 
         require(hash.recover(sig) == signer, "INVALID SIGN");
         _mintId(msg.sender, id, 1);
+    }
+
+    function mintMystery(uint256 amount, address receiver) external onlyMysteryCardsManager {
+        _mintId(receiver, 5, amount);
+    }
+
+    function mintEssences(uint256[] memory ids, uint256[] memory amounts, address receiver) external
+    onlyMysteryCardsManager
+    {
+        for(uint i = 0; i < ids.length;i++){
+            uint256 id = ids[i];
+            require(id >= 1 && id <= 4, "INCID");
+            _mintId(receiver,id,amounts[i]);
+        }
     }
 
     function burn(uint256 id, uint256 amount) external SupportedId(id) {
@@ -72,7 +91,7 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         _burn(msg.sender, id, amount);
         totalNft -= amount;
         totalSupply[id] -= amount;
-        emit Burn(msg.sender,id,amount);
+        emit Burn(msg.sender, id, amount);
     }
 
 
@@ -114,6 +133,10 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
         signer = _signer;
     }
 
+    function setMysteryCardsManager(address _mysteryCardsManager) public onlyOwner {
+        mysteryCardsManager = _mysteryCardsManager;
+    }
+
     function setUri(string memory _url) public onlyOwner {
         _setURI(_url);
     }
@@ -134,10 +157,10 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
 
     function _mintId(address user, uint256 id, uint256 amount) private {
         require(amount != 0, "AMIZ");
-        require((totalNft + amount) <= MAX_NFT,"SUPEXC");
+        require((totalNft + amount) <= MAX_NFT, "SUPEXC");
         _mint(user, id, amount, "");
         totalNft += amount;
         totalSupply[id] += amount;
-        emit Mint(user,id,amount);
+        emit Mint(user, id, amount);
     }
 }
