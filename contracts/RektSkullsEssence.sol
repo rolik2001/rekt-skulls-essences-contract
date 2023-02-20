@@ -14,7 +14,6 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
     using ECDSA for bytes32;
 
     address public signer;
-    address public mysteryCardsManager;
     uint256 public totalNft;
     bool public wlActive;
 
@@ -26,6 +25,8 @@ contract RektSkullsEssence is ERC1155Upgradeable, OwnableUpgradeable, ERC2981Upg
 
     mapping(uint256 => uint256) public totalSupply;
     mapping(address => uint256) public mintNonce;
+
+    address public mysteryCardsManager;
 
     event Mint(address indexed user, uint256 indexed id, uint256 amount);
     event MintBatch(address indexed user, uint256[] ids, uint256[] amounts);
